@@ -53,7 +53,16 @@ int main()
 	}else{
 		cout<< "sorry, cannot solve the equation"<<endl;
 	}
-
+	yn = m1.FullPivotGaussElimation( gaussA, gaussb);
+	if( yn == true)
+	{
+		vector<Type> r1 = m1.getvX();
+		cout<< "4st: The result of Gauss Elimnation with Full Pivoting is :"<< endl;
+		cout<<"vector x:"<<endl;
+		cout<<r1;
+	}else{
+		cout<< "sorry, cannot solve the equation"<<endl;
+	}
 
 	return 0;
-}
+}  
