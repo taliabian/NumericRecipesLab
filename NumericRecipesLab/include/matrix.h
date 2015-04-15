@@ -136,6 +136,8 @@ namespace matrixlab
 	Matrix<Type> ExchangeRows( Matrix<Type> &, int, int );
 	template<typename Type>
 	Matrix<Type> ExchangeCols( Matrix<Type> &, int, int );
+	template<typename Type>
+	Matrix<Type> CopyFromMatrix( const Matrix<Type> &A, int row1, int col1, int row2, int col2 );
 
     template<typename Type>
     Matrix<Type>& optMult( const Matrix<Type>&, const Matrix<Type>&, Matrix<Type>& );

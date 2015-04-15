@@ -1158,7 +1158,12 @@ Matrix<Type> abs( const Matrix<Type> &A )
 
     for( int i=0; i<m; ++i )
         for( int j=0; j<n; ++j )
-            tmp[i][j] = (Type)abs( -1);
+		{
+			if ( A[i][j] < 0)
+				tmp[i][j] = -A[i][j];
+			else
+				tmp[i][j] = A[i][j];
+		}
 
     return tmp;
 }
@@ -1324,10 +1329,12 @@ Matrix<Type> ExchangeRows( Matrix<Type> &A, int row1, int row2 )
 {
 	Matrix<Type> tmp = A;
 	int cols = A.cols();
-	vector<Type> tmpv = A.getRow( row1 );
-	tmp.setRow( tmp.getRow(row2), row1) ;
-	tmp.setRow( tmpv, row2);
-
+	if( row1 != row2)
+	{
+		vector<Type> tmpv = A.getRow( row1 );
+		tmp.setRow( tmp.getRow(row2), row1) ;
+		tmp.setRow( tmpv, row2);
+	}
 	return tmp;
 }
 template<typename Type>
@@ -1335,9 +1342,23 @@ Matrix<Type> ExchangeCols( Matrix<Type> &A, int col1, int col2 )
 {
 	Matrix<Type> tmp = A;
 	int rows = A.rows();
-	vector<Type> tmpv = A.getColumn( col1 );
-	tmp.setColumn( tmp.getColumn(col2), col1); 
-	tmp.setColumn( tmpv, col2);
+	if( col1 != col2)
+	{
+		vector<Type> tmpv = A.getColumn( col1 );
+		tmp.setColumn( tmp.getColumn(col2), col1); 
+		tmp.setColumn( tmpv, col2);
+	}
+	return tmp;
+}
 
+template<typename Type>
+Matrix<Type> CopyFromMatrix( const Matrix<Type> &A, int row1, int col1, int row2, int col2 )
+{
+	int rows = row2-row1+1;
+	int cols = col2-col1+1;
+	Matrix<Type> tmp( rows, cols );
+	for( int i=0; i<rows; i++)
+		for(int j=0; j<cols; j++)
+			tmp[i][j] = A[row1+i][col1+j];
 	return tmp;
 }

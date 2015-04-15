@@ -11,7 +11,6 @@
 #include ".\include\matrix.h"
 #include ".\include\numeric.h"
 
-
 using namespace std;
 using namespace matrixlab;
 using namespace NumericRecipesLab;
@@ -41,12 +40,14 @@ int main()
 	{
 		cin>>gaussb[i];
 	}
-	Numeric<Type> m1;
+	Numeric<Type> m1; 
+	vector<Type> r1(tmp);
+	Matrix<Type> inv;
 	bool yn;
 	yn = m1.GenGaussElimation( gaussA, gaussb);
 	if( yn == true)
 	{
-		vector<Type> r1 = m1.getvX();
+		r1 = m1.getvX();
 		cout<< "4st: The result of General Gauss Elimnation is :"<< endl;
 		cout<<"vector x:"<<endl;
 		cout<<r1;
@@ -56,10 +57,34 @@ int main()
 	yn = m1.FullPivotGaussElimation( gaussA, gaussb);
 	if( yn == true)
 	{
-		vector<Type> r1 = m1.getvX();
+		r1 = m1.getvX();
 		cout<< "4st: The result of Gauss Elimnation with Full Pivoting is :"<< endl;
 		cout<<"vector x:"<<endl;
 		cout<<r1;
+	}else{
+		cout<< "sorry, cannot solve the equation"<<endl;
+	}
+	yn = m1.PartialPivotGaussElimation( gaussA, gaussb);
+	if( yn == true)
+	{
+		r1 = m1.getvX();
+		cout<< "4st: The result of Gauss Elimnation with Partial Pivoting is :"<< endl;
+		cout<<"vector x:"<<endl;
+		cout<<r1;
+	}else{
+		cout<< "sorry, cannot solve the equation"<<endl;
+	}
+	yn = m1.GaussJordanElimation( gaussA, gaussb);
+	if( yn == true)
+	{
+		r1 = m1.getvX();
+		cout<< "4st: The result of Gauss Elimnation with Partial Pivoting is :"<< endl;
+		cout<<"vector x:"<<endl;
+		cout<<r1;
+		inv = m1.getinvM();
+		cout<< "5st: The Inv of Equation Matrix paraments is :"<< endl;
+		cout<<"Inv(A):"<<endl;
+		cout<<inv;
 	}else{
 		cout<< "sorry, cannot solve the equation"<<endl;
 	}

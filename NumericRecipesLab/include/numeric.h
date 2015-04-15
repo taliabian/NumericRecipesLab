@@ -32,8 +32,14 @@ namespace NumericRecipesLab
 		bool GenGaussElimation( const Matrix<Type> &A, const vector<Type> &b );
 		/// Gaussian elimination with full pivoting
 		bool FullPivotGaussElimation( const Matrix<Type> &A, const vector<Type> &b );
+		/// Gaussian elimination with partital column pivoting
+		bool PartialPivotGaussElimation( const Matrix<Type> &A, const vector<Type> &b );
+		/// Gaussian-Jordan elimination 
+		bool GaussJordanElimation( const Matrix<Type> &A, const vector<Type> &b );
 		/// get the the result of equations of m by m matrix
 		vector<Type> getvX() const ;
+		/// get the the result of a matrix's inv
+		Matrix<Type> getinvM() const; 
 
 		/// 		
 		Type operator=( const Type &x );
@@ -41,6 +47,8 @@ namespace NumericRecipesLab
 	private:
 		/// the result of equations of m by m matrix
 		vector<Type> vX;
+		/// the result of matrix's inv
+		Matrix<Type> invM;
 
 	};
 	#include "numeric_impl.h"
