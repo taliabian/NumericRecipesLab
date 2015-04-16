@@ -57,7 +57,7 @@ namespace matrixlab
         vector<Type> getColumn( int column ) const;
 		void setRow( const vector<Type> &v, int row );
         void setColumn( const vector<Type> &v, int column );
-
+		void ReplaceByMatrix( const Matrix<Type> &A, int, int  );
 		// operator
         Matrix<Type>& operator+=( const Type& );
         Matrix<Type>& operator+=( const Matrix<Type>& );
@@ -138,6 +138,7 @@ namespace matrixlab
 	Matrix<Type> ExchangeCols( Matrix<Type> &, int, int );
 	template<typename Type>
 	Matrix<Type> CopyFromMatrix( const Matrix<Type> &A, int row1, int col1, int row2, int col2 );
+	
 
     template<typename Type>
     Matrix<Type>& optMult( const Matrix<Type>&, const Matrix<Type>&, Matrix<Type>& );

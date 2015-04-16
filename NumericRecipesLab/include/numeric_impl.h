@@ -36,7 +36,12 @@ bool Numeric<Type>:: GenGaussElimation( const Matrix<Type> &A, const vector<Type
 			for( j=m; j<num; j++)
 			{
 				if( j == m )
-					tmpB[i][j] = 0;
+				{
+					if( tmpB[i][j] == 0)
+						break;
+					else
+						tmpB[i][j] = 0;
+				}
 				else
 				{
 					if ( tmpA[m][m] == 0)
@@ -45,7 +50,10 @@ bool Numeric<Type>:: GenGaussElimation( const Matrix<Type> &A, const vector<Type
 						tmpB[i][j] = tmpB[i][j] - tmpA[m][j]*tmpA[i][m]/tmpA[m][m];
 				}
 			}
-			tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];
+			if(  tmpA[i][m] == 0 )
+				continue;
+			else
+				tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];// i's row
 		}
 		tmpA = tmpB;
 		tmpVa = tmpVb;
@@ -108,7 +116,12 @@ bool Numeric<Type>::FullPivotGaussElimation( const Matrix<Type> &A, const vector
 			for( j=m; j<num; j++)
 			{
 				if( j == m )
-					tmpB[i][j] = 0;
+				{
+					if( tmpB[i][j] == 0)
+						break;
+					else
+						tmpB[i][j] = 0;
+				}
 				else
 				{
 					if ( tmpA[m][m] == 0)
@@ -117,13 +130,15 @@ bool Numeric<Type>::FullPivotGaussElimation( const Matrix<Type> &A, const vector
 						tmpB[i][j] = tmpB[i][j] - tmpA[m][j]*tmpA[i][m]/tmpA[m][m];
 				}
 			}
-			tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];
+			if(  tmpA[i][m] == 0 )
+				continue;
+			else
+				tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];// i's row
 		}
 		tmpA = tmpB;
 		tmpVa = tmpVb;
 	}
 	// compute the x[i]
-
 	for ( i=(num-1); i>=0; i--)
 	{
 		if ( i==(num-1) )
@@ -186,7 +201,12 @@ bool Numeric<Type>::PartialPivotGaussElimation( const Matrix<Type> &A, const vec
 			for( j=m; j<num; j++)
 			{
 				if( j == m )
-					tmpB[i][j] = 0;
+				{
+					if( tmpB[i][j] == 0)
+						break;
+					else
+						tmpB[i][j] = 0;
+				}
 				else
 				{
 					if ( tmpA[m][m] == 0)
@@ -195,7 +215,10 @@ bool Numeric<Type>::PartialPivotGaussElimation( const Matrix<Type> &A, const vec
 						tmpB[i][j] = tmpB[i][j] - tmpA[m][j]*tmpA[i][m]/tmpA[m][m];
 				}
 			}
-			tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];
+			if(  tmpA[i][m] == 0 )
+				continue;
+			else
+				tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];// i's row
 		}
 		tmpA = tmpB;
 		tmpVa = tmpVb;
@@ -262,7 +285,12 @@ bool  Numeric<Type>::GaussJordanElimation( const Matrix<Type> &A, const vector<T
 				for( j=m; j<num; j++)// column
 				{
 					if( j == m )
-						tmpB[i][j] = 0;
+					{
+						if( tmpB[i][j] == 0)
+							break;
+						else
+							tmpB[i][j] = 0;
+					}
 					else
 					{
 						if ( tmpA[m][m] == 0)
@@ -271,14 +299,20 @@ bool  Numeric<Type>::GaussJordanElimation( const Matrix<Type> &A, const vector<T
 							tmpB[i][j] = tmpB[i][j] - tmpA[m][j]*tmpA[i][m]/tmpA[m][m];
 					}
 				}
-				tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];// i's row
-				for( k=num-1-m; k<num; k++)
+				if(  tmpA[i][m] == 0 )
+					continue;
+				else
 				{
-					tmpD[i][k] = tmpD[i][k] - tmpE[m][k]*tmpA[i][m] /tmpA[m][m];
+					tmpVb[i] = tmpVb[i] - tmpVa[m]*tmpA[i][m] /tmpA[m][m];// i's row
+					for( k=0; k<num; k++)
+					{
+						tmpD[i][k] = tmpD[i][k] - tmpE[m][k]*tmpA[i][m] /tmpA[m][m];
+					}
 				}
 			}
 		}
 		tmp = tmpB[m][m];
+		/// units
 		for( j=m; j<num; j++)
 		{
 			if( j==m )
@@ -294,6 +328,7 @@ bool  Numeric<Type>::GaussJordanElimation( const Matrix<Type> &A, const vector<T
 		tmpA = tmpB;
 		tmpVa = tmpVb;
 	}
+	/// compute xi( xi == vb) and inv(M)
 	for( i=0; i<num-1; i++)
 	{
 		tmpVb[i] = tmpVb[i] - tmpVb[num-1]*tmpB[i][num-1]/tmpB[num-1][num-1];//i's row
@@ -313,6 +348,197 @@ bool  Numeric<Type>::GaussJordanElimation( const Matrix<Type> &A, const vector<T
 	invM = tmpD;
 	return true;
 }
+/// Compute symbolic matrix inverse with Gaussian-Jordan Elimintaion
+template <typename Type>
+bool Numeric<Type>::InvMwithGaussJordan( const Matrix<Type> &A)
+{
+	int num = A.rows();
+	Matrix<Type> tmpA = A;
+	Matrix<Type> tmpB;
+	Matrix<Type> tmpC;
+	Matrix<Type> tmpD = eye(num,Type(1));
+	Matrix<Type> tmpE = eye(num, Type(1));
+	int *maxrow = new int[num-1];
+	Data_Pos<Type> maxandpos;
+	int i,j,k;
+	Type tmp;
+	for ( int m = 0; m<(num-1); m++) // the m'th cycle
+	{
+		/// find the max pivoting element of matrix's m column
+		tmpC = CopyFromMatrix(tmpA, m, m, num-1, m);
+		maxandpos = FindMaxandPos(abs(tmpC));
+		maxrow[m] = maxandpos.row + m;
+		/// change the rows 
+		tmpA = ExchangeRows(tmpA,m,maxrow[m]);
+		tmpB = tmpA;
+		/// change the tmpD( for invA ) squence
+		tmpD = ExchangeRows(tmpD,m,maxrow[m]);
+		tmpE = tmpD;
+		for ( i=0; i<num; i++)// row
+		{
+			if( i != m )
+			{
+				for( j=m; j<num; j++)// column
+				{
+					if( j == m )
+					{
+						if( tmpB[i][j] == 0)
+							break;
+						else
+							tmpB[i][j] = 0;
+					}
+					else
+					{
+						if ( tmpA[m][m] == 0)
+							return false;
+						else
+							tmpB[i][j] = tmpB[i][j] - tmpA[m][j]*tmpA[i][m]/tmpA[m][m];
+					}
+				}
+				if(  tmpA[i][m] == 0 )
+					continue;
+				else
+				{
+					for( k=0; k<num; k++)
+					{
+						tmpD[i][k] = tmpD[i][k] - tmpE[m][k]*tmpA[i][m] /tmpA[m][m];
+					}
+				}
+			}
+		}
+		tmp = tmpB[m][m];
+		/// units
+		for( j=m; j<num; j++)
+		{
+			if( j==m )
+				tmpB[m][j] = 1;
+			else
+				tmpB[m][j] = tmpB[m][j] / tmp;
+		}
+		for( k=0; k<num; k++)
+		{
+			tmpD[m][k] = tmpD[m][k] / tmp; //k's row
+		}
+		tmpA = tmpB;
+	}
+	/// compute xi( xi == vb) and inv(M)
+	for( i=0; i<num-1; i++)
+	{
+		for( k=0; k<num; k++)
+		{
+			tmpD[i][k] = tmpD[i][k] - tmpD[num-1][k]*tmpB[i][num-1]/tmpB[num-1][num-1]; 
+		}
+		tmpB[i][num-1] = 0;
+	}
+	for( k=0; k<num; k++)
+	{
+		tmpD[num-1][k] = tmpD[num-1][k]/tmpB[num-1][num-1];
+	}
+	tmpB[num-1][num-1] = 1;
+	invM = tmpD;
+	return true;
+}
+
+/// L-U decomposition of Matrix 
+template <typename Type>
+bool Numeric<Type>::MatLUdec( const Matrix<Type> &A)
+{
+	int num = A.rows();
+	Matrix<Type> tmpA = A;
+	Matrix<Type> tmpB ;
+	Matrix<Type> tmpL1 = eye(num, Type(1));
+	Matrix<Type> tmpL2 = eye(num, Type(1));
+	int *maxrow = new int[num-2];
+	int *maxcol = new int[num-2];
+	Data_Pos<Type> maxandpos;
+	LM = tmpL1;
+	int i,j;
+	for( j=0; j<num; j++) // colum's
+	{
+		/// find the max pivoting element of matrix's m column
+		tmpB = CopyFromMatrix(tmpA, j, j, num-1, j);
+		maxandpos = FindMaxandPos(abs(tmpB));
+		maxrow[j] = maxandpos.row + j;
+		/// change the rows 
+		tmpA = ExchangeRows(tmpA,j,maxrow[j]);
+		UM = tmpA;
+		for( i=j+1; i<num; i++) // row's
+		{
+			tmpL1[i][j] = tmpA[i][j]/tmpA[j][j];
+			tmpL2[i][j] = -tmpL1[i][j];
+		}
+		tmpA = tmpL2*tmpA;
+		LM = LM*tmpL1;
+		UM = tmpL2*UM;
+		for( i=j+1; i<num; i++) // row's
+		{
+			tmpL1[i][j] = 0;
+			tmpL2[i][j] = 0;
+		}
+	} 
+	// back the L origin squencese
+	for( i=num-2; i>=0; i--)
+	{
+		if( i != maxrow[i])
+		{
+			tmpA = CopyFromMatrix(LM, i, i, i, num-1);
+			tmpB = CopyFromMatrix(LM, maxrow[i], i, maxrow[i], num-1);
+			LM.ReplaceByMatrix( tmpA, maxrow[i], i);
+			LM.ReplaceByMatrix( tmpB, i, i);
+		}
+	}
+	return true;
+}
+/// L-U-P decomposition of Matrix
+template <typename Type>
+bool Numeric<Type>::MatLUPdec( const Matrix<Type> &A)
+{
+	int num = A.rows();
+	Matrix<Type> tmpA = A;
+	Matrix<Type> tmpB ;
+	Matrix<Type> tmpL1 = eye(num, Type(1));
+	Matrix<Type> tmpL2 = eye(num, Type(1));
+	int *maxrow = new int[num-2];
+	int *maxcol = new int[num-2];
+	Data_Pos<Type> maxandpos;
+	LM = tmpL1;
+	PM = tmpL1;
+	int i,j;
+	for( j=0; j<num; j++) // colum's
+	{
+		/// find the max pivoting element of matrix's m column
+		tmpB = CopyFromMatrix(tmpA, j, j, num-1, j);
+		maxandpos = FindMaxandPos(abs(tmpB));
+		maxrow[j] = maxandpos.row + j;
+		/// change the rows 
+		tmpA = ExchangeRows(tmpA,j,maxrow[j]);
+		UM = tmpA;
+		for( i=j+1; i<num; i++) // row's
+		{
+			tmpL1[i][j] = tmpA[i][j]/tmpA[j][j];
+			tmpL2[i][j] = -tmpL1[i][j];
+		}
+		tmpA = tmpL2*tmpA;
+		LM = LM*tmpL1;
+		UM = tmpL2*UM;
+		for( i=j+1; i<num; i++) // row's
+		{
+			tmpL1[i][j] = 0;
+			tmpL2[i][j] = 0;
+		}
+	} 
+	// back the L origin squencese
+	for( i=num-2; i>=0; i--)
+	{
+		if( i != maxrow[i])
+		{
+			PM = ExchangeRows(PM,i,maxrow[i]);
+			cout << "PM:" << PM;
+		}
+	}
+	return true;
+}
+
 ///  get the the result of equations of m by m matrix
 template <typename Type>
 vector<Type> Numeric<Type>::getvX() const
@@ -324,6 +550,24 @@ template <typename Type>
 Matrix<Type>  Numeric<Type>::getinvM() const
 {
 	return invM;
+}
+/// get the the result of a matrix's inv
+template <typename Type>
+Matrix<Type>  Numeric<Type>::getMatL() const
+{
+	return LM;
+}
+/// get the the result of a matrix's inv
+template <typename Type>
+Matrix<Type>  Numeric<Type>::getMatU() const
+{
+	return UM;
+}
+/// get the the result of a matrix's inv
+template <typename Type>
+Matrix<Type>  Numeric<Type>::getMatP() const
+{
+	return PM;
 }
 /// \brief 重载"=",系数赋值
 /// \param x 右值

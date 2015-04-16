@@ -36,11 +36,22 @@ namespace NumericRecipesLab
 		bool PartialPivotGaussElimation( const Matrix<Type> &A, const vector<Type> &b );
 		/// Gaussian-Jordan elimination 
 		bool GaussJordanElimation( const Matrix<Type> &A, const vector<Type> &b );
+		/// Compute symbolic matrix inverse with Gaussian-Jordan Elimintaion
+		bool InvMwithGaussJordan( const Matrix<Type> &A);
+		/// L-U decomposition of Matrix of L
+		bool MatLUdec( const Matrix<Type> &A);
+		/// L-U decomposition of Matrix of U
+		bool MatLUPdec( const Matrix<Type> &A);
 		/// get the the result of equations of m by m matrix
 		vector<Type> getvX() const ;
 		/// get the the result of a matrix's inv
 		Matrix<Type> getinvM() const; 
-
+		/// get the the result of a matrix's L
+		Matrix<Type> getMatL() const; 
+		/// get the the result of a matrix's U
+		Matrix<Type> getMatU() const; 
+		/// get the the result of a matrix's P
+		Matrix<Type> getMatP() const; 
 		/// 		
 		Type operator=( const Type &x );
 
@@ -49,6 +60,12 @@ namespace NumericRecipesLab
 		vector<Type> vX;
 		/// the result of matrix's inv
 		Matrix<Type> invM;
+		/// the result of matrix's L
+		Matrix<Type> LM;
+		/// the result of matrix's U
+		Matrix<Type> UM;
+		/// the result of matrix's P
+		Matrix<Type> PM;
 
 	};
 	#include "numeric_impl.h"

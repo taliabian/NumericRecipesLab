@@ -1362,3 +1362,13 @@ Matrix<Type> CopyFromMatrix( const Matrix<Type> &A, int row1, int col1, int row2
 			tmp[i][j] = A[row1+i][col1+j];
 	return tmp;
 }
+template<typename Type>
+void Matrix<Type>::ReplaceByMatrix( const Matrix<Type> &A, int r, int c )
+{
+	int rn = A.rows();
+	int cn = A.cols();
+	int i,j;
+	for( i=0; i<rn; i++)
+		for( j=0; j<cn; j++)
+			prow0[r+i][c+j] = A[i][j];
+}

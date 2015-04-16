@@ -43,6 +43,7 @@ int main()
 	Numeric<Type> m1; 
 	vector<Type> r1(tmp);
 	Matrix<Type> inv;
+	Matrix<Type> L, U, P;
 	bool yn;
 	yn = m1.GenGaussElimation( gaussA, gaussb);
 	if( yn == true)
@@ -78,7 +79,7 @@ int main()
 	if( yn == true)
 	{
 		r1 = m1.getvX();
-		cout<< "4st: The result of Gauss Elimnation with Partial Pivoting is :"<< endl;
+		cout<< "4st: The result of Gaussian-Jordan elimination  is :"<< endl;
 		cout<<"vector x:"<<endl;
 		cout<<r1;
 		inv = m1.getinvM();
@@ -88,6 +89,49 @@ int main()
 	}else{
 		cout<< "sorry, cannot solve the equation"<<endl;
 	}
+	
+	yn = m1.InvMwithGaussJordan( gaussA);
+	if( yn == true)
+	{
+		inv = m1.getinvM();
+		cout<< "The Inv of Equation Matrix paraments is :"<< endl;
+		cout<<"Inv(A):"<<endl;
+		cout<<inv;
+	}else{
+		cout<< "sorry, cannot solve the equation"<<endl;
+	}
+	
+	yn = m1.MatLUdec( gaussA);
+	if( yn == true)
+	{
+		U = m1.getMatU();
+		L = m1.getMatL();
+		cout<< "The L of Matrix :"<< endl;
+		cout<< L;
+		cout<< "The U of Matrix :"<< endl;
+		cout<< U;
+	}else{
+		cout<< "sorry, cannot decomposition the matrix"<<endl;
+	}
+	cout<< "L*U: " << L*U;
 
+	yn = m1.MatLUPdec( gaussA);
+	if( yn == true)
+	{
+		U = m1.getMatU();
+		L = m1.getMatL();
+		P = m1.getMatP();
+		cout<< "The L of Matrix :"<< endl;
+		cout<< L;
+		cout<< "The U of Matrix :"<< endl;
+		cout<< U;
+		cout<< "The P of Matrix :"<< endl;
+		cout<< P;
+	}else{
+		cout<< "sorry, cannot decomposition the matrix"<<endl;
+	}
+	cout<< "L*U: " << L*U;
+	cout << "P*A" << P*gaussA;
+	
 	return 0;
 }  
