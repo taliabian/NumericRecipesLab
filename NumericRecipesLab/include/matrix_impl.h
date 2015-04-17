@@ -956,6 +956,14 @@ Matrix<Type> eye( int N, const Type &x )
 
 	return tmp;
 }
+/// \brief 生成零矩阵
+/// \param x 维数
+template <typename Type>
+Matrix<Type> zeros( int row, int col )
+{
+    Matrix<Type> tmp( row, col );
+	return tmp;
+}
 /// \brief 生成矩阵A对角元素
 /// \param A 矩阵
 template <typename Type>
@@ -1371,4 +1379,23 @@ void Matrix<Type>::ReplaceByMatrix( const Matrix<Type> &A, int r, int c )
 	for( i=0; i<rn; i++)
 		for( j=0; j<cn; j++)
 			prow0[r+i][c+j] = A[i][j];
+}
+template<typename Type>
+void Matrix<Type>::SetData( Type d, int rowd, int cold)
+{
+	prow0[rowd][cold] = d;
+}
+template<typename Type>
+Matrix<Type> ExchangeRowData( Matrix<Type> &A , int r1, int c1, int r2, int c2, int size )
+{
+	Matrix<Type> tmp = A;
+	int i;
+	Type t;
+	for( i=0; i<size; i++)
+	{
+		t = tmp[r1][i+c1];
+		tmp[r1][i+c1] = tmp[r2][i+c2];
+		tmp[r2][i+c2] = t;
+	}
+	return tmp;
 }

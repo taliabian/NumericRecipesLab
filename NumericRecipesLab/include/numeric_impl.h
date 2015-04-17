@@ -11,11 +11,15 @@ Numeric<Type>::Numeric()
 {
 	//
 }
+template <typename Type>
+Numeric<Type>::Numeric( const Matrix<Type> &M )
+{
+
+}
 
 template <typename Type>
 Numeric<Type>::~Numeric()
 {
-	//
 }
 
 /// General Gaussian elimination
@@ -496,14 +500,17 @@ bool Numeric<Type>::MatLUPdec( const Matrix<Type> &A)
 	int num = A.rows();
 	Matrix<Type> tmpA = A;
 	Matrix<Type> tmpB ;
-	Matrix<Type> tmpL1 = eye(num, Type(1));
 	Matrix<Type> tmpL2 = eye(num, Type(1));
 	int *maxrow = new int[num-2];
 	int *maxcol = new int[num-2];
 	Data_Pos<Type> maxandpos;
-	LM = tmpL1;
-	PM = tmpL1;
-	int i,j;
+	int *pcol = new int[num-1];
+	int i,j ,k;
+	for( i=0; i<num; i++)
+		pcol[i] = i;
+	LM = tmpL2;
+	PM = tmpL2;
+
 	for( j=0; j<num; j++) // colum's
 	{
 		/// find the max pivoting element of matrix's m column
@@ -513,32 +520,165 @@ bool Numeric<Type>::MatLUPdec( const Matrix<Type> &A)
 		/// change the rows 
 		tmpA = ExchangeRows(tmpA,j,maxrow[j]);
 		UM = tmpA;
+		LM = ExchangeRowData( LM, j, 0, maxrow[j], 0, j );
+		// record the P's change squencese
+		if( j != maxrow[j] && (j<num-1))
+		{
+			k = pcol[j];
+			pcol[j]= pcol[maxrow[j]];
+			pcol[maxrow[j]] = k;
+		}
 		for( i=j+1; i<num; i++) // row's
 		{
-			tmpL1[i][j] = tmpA[i][j]/tmpA[j][j];
-			tmpL2[i][j] = -tmpL1[i][j];
+			LM[i][j] = tmpA[i][j]/tmpA[j][j];
+			tmpL2[i][j] = -LM[i][j];
 		}
 		tmpA = tmpL2*tmpA;
-		LM = LM*tmpL1;
 		UM = tmpL2*UM;
 		for( i=j+1; i<num; i++) // row's
 		{
-			tmpL1[i][j] = 0;
 			tmpL2[i][j] = 0;
 		}
-	} 
-	// back the L origin squencese
-	for( i=num-2; i>=0; i--)
+	}
+	PM = PerMatrix( num, pcol);
+
+	return true;
+}
+
+/// solve the multiply funciton with L-U-P 
+template <typename Type>
+bool Numeric<Type>::LUPsolveFun( const Matrix<Type> &A, const vector<Type> &b)
+{
+	if( !MatLUPdec(A))
+		return false;
+	vector<Type> tmpb = PM*b;
+	int size = b.size();
+	vX = vector<Type>(size);
+	int i,j;
+	vX[0] = tmpb[0]/LM[0][0];
+	
+	for( i=1; i<size; i++)
 	{
-		if( i != maxrow[i])
+		vX[i] = tmpb[i];
+		for( j=0; j<i; j++)
 		{
-			PM = ExchangeRows(PM,i,maxrow[i]);
-			cout << "PM:" << PM;
+			vX[i] = vX[i] - LM[i][j]*vX[j];
+		}
+		vX[i] = vX[i]/LM[i][i];
+	}
+	tmpb = vX;
+	vX[size-1] = tmpb[size-1] / UM[size-1][size-1];
+	for( i=size-2; i>=0; i--)
+	{
+		vX[i] = tmpb[i];
+		for( j=i+1; j<size; j++)
+		{
+			vX[i] = vX[i] - UM[i][j]*vX[j];
+		}
+		vX[i] = vX[i]/UM[i][i];
+	}
+	return true;
+}
+/// solve the multiply funciton with LeastSquares( Overdetermined  Functions ) 
+template <typename Type>
+bool Numeric<Type>::LeasetSquaresSolveFun( const Matrix<Type> &A, const vector<Type> &b)
+{
+	int rows = A.rows();
+	int cols = A.cols();
+	Matrix<Type> AtrA = multTr( A, A);
+	cout << "A*A(T)" <<AtrA;
+	Matrix<Type> trA = trT(A);
+	cout << "A(T)" <<trA;
+	if( !MatLUPdec( AtrA))
+		return false;
+	cout <<"LM: "<<LM;
+	cout <<"UM: "<<UM;
+	cout <<"PM: "<<PM;
+	Matrix<Type> l = eye(rows, Type(1));
+	Matrix<Type> u = eye(rows, Type(1));
+	Type s;
+	int i, j , k ,n;
+	n = rows;
+	/////////////////////inv(U) and inv(L) ////////////////
+	//for (i=0;i<n;i++) /*求矩阵U的逆 */
+	//{
+	//	u[i][i]=1/UM[i][i];//对角元素的值，直接取倒数
+	//	for (k=i-1;k>=0;k--)
+	//	{
+	//		s=0;
+	//		for (j=k+1;j<=i;j++)
+	//		{
+	//			s=s+UM[k][j]*u[j][i];
+	//		}
+	//		u[k][i]=-s/UM[k][k];//迭代计算，按列倒序依次得到每一个值，
+	//	}
+	//}
+	//for (i=0;i<n;i++) //求矩阵L的逆 
+	//{
+	//	for (k=i+1;k<n;k++)
+	//	{
+	//		for (j=i;j<=k-1;j++)
+	//			l[k][i]=l[k][i]-LM[k][j]*l[j][i];   //迭代计算，按列顺序依次得到每一个值
+	//	}
+	//}
+	InvU(UM);
+	cout<< invUM;
+	InvL(LM);
+	cout<< invLM;
+}
+
+/// inv of L
+template <typename Type>
+bool Numeric<Type>::InvL( Matrix<Type> &L)
+{
+	int rows = L.rows();
+	invLM = eye(rows, Type(1));
+	int i,j,k;
+	for (i=0;i<rows;i++) //求矩阵L的逆 
+	{
+		for (k=i+1;k<rows;k++)
+		{
+			for (j=i;j<=k-1;j++)
+				invLM[k][i]=invLM[k][i]-L[k][j]*invLM[j][i];   //迭代计算，按列顺序依次得到每一个值
 		}
 	}
 	return true;
 }
-
+/// inv of U;
+template <typename Type>
+bool Numeric<Type>::InvU( Matrix<Type> &U)
+{
+	int rows = U.rows();
+	invUM = eye(rows, Type(1));
+	int i,j,k,s;
+	for (i=0;i<rows;i++) /*求矩阵U的逆 */
+	{
+		invUM[i][i]=1/U[i][i];//对角元素的值，直接取倒数
+		for (k=i-1;k>=0;k--)
+		{
+			s=0;
+			for (j=k+1;j<=i;j++)
+			{
+				s=s+U[k][j]*invUM[j][i];
+			}
+			invUM[k][i]=-s/U[k][k];//迭代计算，按列倒序依次得到每一个值，
+		}
+	}
+	cout << invUM;
+	return true;
+}
+/// get the the result of a matrix's L's inv
+template <typename Type>
+Matrix<Type> Numeric<Type>::getMatinvL() const
+{
+	return invLM;
+}
+/// get the the result of a matrix's U's inv
+template <typename Type>
+Matrix<Type> Numeric<Type>::getMatinvU() const
+{
+	return invUM;
+}
 ///  get the the result of equations of m by m matrix
 template <typename Type>
 vector<Type> Numeric<Type>::getvX() const
@@ -575,5 +715,16 @@ Matrix<Type>  Numeric<Type>::getMatP() const
 template <typename Type>
 Type Numeric<Type>::operator=( const Type &x )
 {
+	return tmp;
+}
+
+template<typename Type>
+Matrix<Type>  Numeric<Type>::PerMatrix( int size , int *pcol )
+{
+	Matrix<Type> tmp(size, size);
+	for( int i=0; i<size; i++)
+	{
+		tmp[i][pcol[i]] = 1;
+	}
 	return tmp;
 }

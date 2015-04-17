@@ -58,6 +58,7 @@ namespace matrixlab
 		void setRow( const vector<Type> &v, int row );
         void setColumn( const vector<Type> &v, int column );
 		void ReplaceByMatrix( const Matrix<Type> &A, int, int  );
+		void SetData( Type, int, int);
 		// operator
         Matrix<Type>& operator+=( const Type& );
         Matrix<Type>& operator+=( const Matrix<Type>& );
@@ -137,6 +138,8 @@ namespace matrixlab
 	template<typename Type>
 	Matrix<Type> ExchangeCols( Matrix<Type> &, int, int );
 	template<typename Type>
+	Matrix<Type> ExchangeRowData( Matrix<Type> &, int, int, int, int, int );
+	template<typename Type>
 	Matrix<Type> CopyFromMatrix( const Matrix<Type> &A, int row1, int col1, int row2, int col2 );
 	
 
@@ -179,6 +182,7 @@ namespace matrixlab
     complex<Type>          trMult( const vector<complex<Type> >&, const vector<complex<Type> >& );
     
 	template<typename Type> Matrix<Type> eye( int, const Type& );
+	template<typename Type> Matrix<Type> zeros( int, int );
     template<typename Type> vector<Type> diag( const Matrix<Type>& );
     template<typename Type> Matrix<Type> diag( const vector<Type>& );
 
