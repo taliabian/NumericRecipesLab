@@ -585,46 +585,22 @@ bool Numeric<Type>::LeasetSquaresSolveFun( const Matrix<Type> &A, const vector<T
 {
 	int rows = A.rows();
 	int cols = A.cols();
-	Matrix<Type> AtrA = multTr( A, A);
-	cout << "A*A(T)" <<AtrA;
+	Matrix<Type> trAA= trMult( A, A);
 	Matrix<Type> trA = trT(A);
-	cout << "A(T)" <<trA;
-	if( !MatLUPdec( AtrA))
+	if( !MatLUPdec( trAA))
 		return false;
-	cout <<"LM: "<<LM;
-	cout <<"UM: "<<UM;
-	cout <<"PM: "<<PM;
+	cout<<"trAA" << trAA;
+	cout<<"trA" << trA;
 	Matrix<Type> l = eye(rows, Type(1));
 	Matrix<Type> u = eye(rows, Type(1));
 	Type s;
-	int i, j , k ,n;
+	int i, j , k ,n; 
 	n = rows;
 	/////////////////////inv(U) and inv(L) ////////////////
-	//for (i=0;i<n;i++) /*求矩阵U的逆 */
-	//{
-	//	u[i][i]=1/UM[i][i];//对角元素的值，直接取倒数
-	//	for (k=i-1;k>=0;k--)
-	//	{
-	//		s=0;
-	//		for (j=k+1;j<=i;j++)
-	//		{
-	//			s=s+UM[k][j]*u[j][i];
-	//		}
-	//		u[k][i]=-s/UM[k][k];//迭代计算，按列倒序依次得到每一个值，
-	//	}
-	//}
-	//for (i=0;i<n;i++) //求矩阵L的逆 
-	//{
-	//	for (k=i+1;k<n;k++)
-	//	{
-	//		for (j=i;j<=k-1;j++)
-	//			l[k][i]=l[k][i]-LM[k][j]*l[j][i];   //迭代计算，按列顺序依次得到每一个值
-	//	}
-	//}
 	InvU(UM);
-	cout<< invUM;
 	InvL(LM);
-	cout<< invLM;
+	vX = invUM*invLM*PM*trA*b;
+	return true;
 }
 
 /// inv of L
@@ -650,7 +626,8 @@ bool Numeric<Type>::InvU( Matrix<Type> &U)
 {
 	int rows = U.rows();
 	invUM = eye(rows, Type(1));
-	int i,j,k,s;
+	int i,j,k;
+	Type s;
 	for (i=0;i<rows;i++) /*求矩阵U的逆 */
 	{
 		invUM[i][i]=1/U[i][i];//对角元素的值，直接取倒数
@@ -658,13 +635,10 @@ bool Numeric<Type>::InvU( Matrix<Type> &U)
 		{
 			s=0;
 			for (j=k+1;j<=i;j++)
-			{
 				s=s+U[k][j]*invUM[j][i];
-			}
 			invUM[k][i]=-s/U[k][k];//迭代计算，按列倒序依次得到每一个值，
 		}
 	}
-	cout << invUM;
 	return true;
 }
 /// get the the result of a matrix's L's inv

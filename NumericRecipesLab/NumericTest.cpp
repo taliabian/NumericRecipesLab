@@ -174,13 +174,20 @@ int main()
 	}
 	vector<Type> gaussb1(rows);
 	cout << "3st: Enter the element of vector b : \n";
-	for (int i=0; i<tmp; i++)
+	for (int i=0; i<rows; i++)
 	{
 		cin>>gaussb1[i];
 	}
 	Numeric<Type> m2( gaussA1 ); 
-	Matrix<Type> m3( rows, rows);
-	m3  = m2.LeasetSquaresSolveFun( gaussA1, gaussb1 );
-
+	yn  = m2.LeasetSquaresSolveFun( gaussA1, gaussb1 );
+	if( yn == true)
+	{
+		r1 = m2.getvX();
+		cout<< "The result is :"<< endl;
+		cout<<"vector x:"<<endl;
+		cout<<r1;
+	}else{
+		cout<< "sorry, cannot solve the equations"<<endl;
+	}
 	return 0;
 }  
