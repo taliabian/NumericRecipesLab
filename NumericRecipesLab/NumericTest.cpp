@@ -22,7 +22,7 @@ const   int     N = 3;
 int main()
 {
 	/// 1
-	cout << "============ General Gauss Elimnation to solve the Nonsingular matrix equation=========="<<endl;
+	/*cout << "============ General Gauss Elimnation to solve the Nonsingular matrix equation=========="<<endl;
 	cout << "1st: Enter the size of matrix A :" ;
 	int tmp = 0;
 	cin >> tmp;
@@ -189,5 +189,49 @@ int main()
 	}else{
 		cout<< "sorry, cannot solve the equations"<<endl;
 	}
+*/
+	cout << "============ Q-R decomposition of Matrix with Schmidt =========="<<endl;
+	cout << "1st: Enter the rows and cols of matrix A :" ;
+	int rows3, cols3;
+	double yn3;
+	cout << "rows: "; 
+	cin >> rows3; 
+	cout << "cols: "; 
+	cin >> cols3;
+	Matrix<Type> gaussA2(rows3, cols3);
+	Matrix<Type> Q(rows3, cols3);
+	Matrix<Type> R(rows3, rows3);
+	vector<Type> r3(cols3);
+	cout << "2st: Enter the element of Nonsingular matrix A : \n";
+	for (int i=0; i<rows3; i++)
+	{
+		for (int j=0; j<cols3; j++)
+		{
+			cin>>gaussA2[i][j];
+		}
+	}
+	vector<Type> gaussb2(rows3);
+	cout << "3st: Enter the element of vector b : \n";
+	for (int i=0; i<rows3; i++)
+	{
+		cin>>gaussb2[i];
+	}
+	Numeric<Type> m3( gaussA2 ); 
+	yn3  = m3.QR_Schmidt_solveFun( gaussA2, gaussb2 );
+	if( yn3 == true)
+	{
+		Q = m3.getMatQ();
+		cout<< "The result of Q is :"<< endl;
+		cout<<Q;
+		R = m3.getMatR();
+		cout<< "The result of R is :"<< endl;
+		cout<<R;
+		r3 = m3.getvX();
+		cout<< "The result of x is :"<< endl;
+		cout<<r3;
+	}else{
+		cout<< "sorry, cannot solve the equations"<<endl;
+	}
+
 	return 0;
 }  

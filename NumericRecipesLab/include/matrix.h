@@ -110,10 +110,14 @@ namespace matrixlab
     Matrix<Type> operator-( const Type&, const Matrix<Type>& );
     template<typename Type>
     Matrix<Type> operator-( const Matrix<Type>&, const Matrix<Type>& );
+	template<typename Type>
+    vector<Type> operator-( const vector<Type>&, const vector<Type>& );
     template<typename Type>
     Matrix<Type> operator*( const Matrix<Type>&, const Type& );
     template<typename Type>
     Matrix<Type> operator*( const Type&, const Matrix<Type>& );
+	template<typename Type>
+    vector<Type> operator*( const Type&, const vector<Type>& );
     template<typename Type>
     Matrix<Type> operator*( const Matrix<Type>&, const Matrix<Type>& );
     template<typename Type>
@@ -141,7 +145,8 @@ namespace matrixlab
 	Matrix<Type> ExchangeRowData( Matrix<Type> &, int, int, int, int, int );
 	template<typename Type>
 	Matrix<Type> CopyFromMatrix( const Matrix<Type> &A, int row1, int col1, int row2, int col2 );
-	
+	template<typename Type>
+	void Vector2Vector( const vector<Type> &v, vector<Type> &v1);
 
     template<typename Type>
     Matrix<Type>& optMult( const Matrix<Type>&, const Matrix<Type>&, Matrix<Type>& );
@@ -187,6 +192,7 @@ namespace matrixlab
     template<typename Type> Matrix<Type> diag( const vector<Type>& );
 
     template<typename Type> Type norm( const Matrix<Type>& );
+	template<typename Type> Type norm( const vector<Type> & );
     template<typename Type> Type norm( const Matrix<complex<Type> >& );
     template<typename Type> void swap( Matrix<Type>&, Matrix<Type>& );
     template<typename Type> vector<Type> sum( const Matrix<Type>& );

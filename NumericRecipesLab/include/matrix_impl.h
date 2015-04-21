@@ -589,6 +589,31 @@ vector<Type> operator*( const Matrix<Type> &A, const vector<Type> &b )
 
 	return tmp;
 }
+/// \brief 重载'*', 向量v各元素乘系数
+/// \param x 系数 
+/// \param v 向量 
+template<typename Type>
+vector<Type> operator*( const Type &x, const vector<Type> &v )
+{
+	vector<Type> tmpv(v.size());
+	for( int i=0; i<v.size(); i++)	
+	{
+		tmpv[i] = x*v[i];
+	}
+	return tmpv;
+}
+
+template<typename Type>
+vector<Type> operator-( const vector<Type> &v1, const vector<Type> &v2 )
+{
+	vector<Type> tmpv(v1.size());
+	for( int i=0; i<v1.size(); i++)	
+	{
+		tmpv.at(i) = v1.at(i) - v2.at(i);
+	}
+	return tmpv;
+}
+
 /// \brief 重载'/', 矩阵各元素除系数
 /// \param A 矩阵
 /// \param x 系数
@@ -1007,6 +1032,19 @@ Type norm( const Matrix<Type> &A )
 
 	return sqrt(sum);
 }
+/// \brief 向量的Frobenius范数（模）
+/// \param v 向量
+template <typename Type>
+Type norm( const vector<Type> &v )
+{
+	int m = v.size();
+
+	Type sum = 0;
+	for( int i=0; i<m; ++i )
+            sum += v.at(i) * v.at(i);
+
+	return sqrt(sum);
+}
 /// \brief 复数矩阵的Frobenius范数 = sqrt(sum(A(i,j)*conj(A(i,j)))) 
 /// \param A 矩阵
 template <typename Type>
@@ -1385,6 +1423,7 @@ void Matrix<Type>::SetData( Type d, int rowd, int cold)
 {
 	prow0[rowd][cold] = d;
 }
+
 template<typename Type>
 Matrix<Type> ExchangeRowData( Matrix<Type> &A , int r1, int c1, int r2, int c2, int size )
 {
@@ -1398,4 +1437,12 @@ Matrix<Type> ExchangeRowData( Matrix<Type> &A , int r1, int c1, int r2, int c2, 
 		tmp[r2][i+c2] = t;
 	}
 	return tmp;
+}
+
+template<typename Type>
+void Vector2Vector( const vector<Type> &v, vector<Type> &v1)
+{
+	vector<Type> tmpv(v.size());
+	for( int i=0; i<v.size(); i++)
+		v1[i] = v[i];
 }

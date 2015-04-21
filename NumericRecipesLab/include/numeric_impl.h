@@ -602,7 +602,46 @@ bool Numeric<Type>::LeasetSquaresSolveFun( const Matrix<Type> &A, const vector<T
 	vX = invUM*invLM*PM*trA*b;
 	return true;
 }
-
+/// Q-R decomposition of Matrix with Gram-Schmidt
+template <typename Type>
+bool Numeric<Type>::MatQRdec_Schmidt( const Matrix<Type> &A )
+{
+	int rows = A.rows();
+	int cols = A.cols();
+	QM = Matrix<Type>(rows, cols);
+	RM = Matrix<Type>(cols, cols);
+	vector<Type> tmpBeta(rows);
+	vector<Type> tmpAlfa(rows);
+	vector<Type> tmp(rows);
+	int i,j;
+	for( i=0; i<cols; i++)
+	{
+		tmpBeta = A.getColumn(i);
+		tmpAlfa = A.getColumn(i);
+		for( j=0; j<i; j++)
+		{
+			tmp = QM.getColumn(j);
+			Vector2Vector(tmpBeta - (trMult(tmpAlfa,tmp)/trMult(tmp,tmp))*tmp, tmpBeta);
+		}
+		QM.setColumn( tmpBeta, i);
+	}
+	for( i=0; i<cols; i++)
+	{
+		QM.setColumn( QM.getColumn(i)/norm(QM.getColumn(i)), i);
+	}
+	RM = trMult( QM, A);
+	InvR( RM );
+	return true;
+}
+/// solve the multiply funciton with Q-R decomposition of Matrix with Gram-Schmidt
+template <typename Type>
+bool Numeric<Type>::QR_Schmidt_solveFun( const Matrix<Type> &A, const vector<Type> &b)
+{
+	if(!MatQRdec_Schmidt(A))
+		return false;
+	vX = multTr(invRM, QM)*b;
+	return true;
+}
 /// inv of L
 template <typename Type>
 bool Numeric<Type>::InvL( Matrix<Type> &L)
@@ -641,6 +680,27 @@ bool Numeric<Type>::InvU( Matrix<Type> &U)
 	}
 	return true;
 }
+/// inv of R;
+template <typename Type>
+bool Numeric<Type>::InvR( Matrix<Type> &R)
+{
+	int rows = R.rows();
+	invRM = eye(rows, Type(1));
+	int i,j,k;
+	Type s;
+	for (i=0;i<rows;i++) /*求矩阵U的逆 */
+	{
+		invRM[i][i]=1/R[i][i];//对角元素的值，直接取倒数
+		for (k=i-1;k>=0;k--)
+		{
+			s=0;
+			for (j=k+1;j<=i;j++)
+				s=s+R[k][j]*invRM[j][i];
+			invRM[k][i]=-s/R[k][k];//迭代计算，按列倒序依次得到每一个值，
+		}
+	}
+	return true;
+}
 /// get the the result of a matrix's L's inv
 template <typename Type>
 Matrix<Type> Numeric<Type>::getMatinvL() const
@@ -664,6 +724,12 @@ template <typename Type>
 Matrix<Type>  Numeric<Type>::getinvM() const
 {
 	return invM;
+}
+/// get the the result of a matrix's R's inv
+template <typename Type>
+Matrix<Type>  Numeric<Type>::getMatinvR() const
+{
+	return invRM;
 }
 /// get the the result of a matrix's inv
 template <typename Type>
@@ -701,4 +767,16 @@ Matrix<Type>  Numeric<Type>::PerMatrix( int size , int *pcol )
 		tmp[i][pcol[i]] = 1;
 	}
 	return tmp;
+}
+/// get the the result of a matrix's Q
+template<typename Type>
+Matrix<Type> Numeric<Type>::getMatQ() const
+{
+	return QM;
+}
+/// get the the result of a matrix's R
+template<typename Type>
+Matrix<Type> Numeric<Type>::getMatR() const
+{
+	return RM;
 }

@@ -47,10 +47,16 @@ namespace NumericRecipesLab
 		bool LUPsolveFun( const Matrix<Type> &A, const vector<Type> &b);
 		/// solve the multiply funciton with LeastSquares( Overdetermined  Functions ) 
 		bool LeasetSquaresSolveFun( const Matrix<Type> &A, const vector<Type> &b);
+		/// Q-R decomposition of Matrix with Gram-Schmidt
+		bool MatQRdec_Schmidt( const Matrix<Type> &A );
+		/// solve the multiply funciton with Q-R decomposition of Matrix with Gram-Schmidt
+		bool QR_Schmidt_solveFun( const Matrix<Type> &A, const vector<Type> &b);
 		/// inv of L
 		bool InvL( Matrix<Type> &L);
 		/// inv of U;
 		bool InvU( Matrix<Type> &U);
+		/// inv of R;
+		bool InvR( Matrix<Type> &R);
 		/// get the the result of equations of m by m matrix
 		vector<Type> getvX() const ;
 		/// get the the result of a matrix's inv
@@ -65,6 +71,12 @@ namespace NumericRecipesLab
 		Matrix<Type> getMatinvL() const; 
 		/// get the the result of a matrix's U's inv
 		Matrix<Type> getMatinvU() const; 
+		/// get the the result of a matrix's R's inv
+		Matrix<Type> getMatinvR() const; 
+		/// get the the result of a matrix's Q
+		Matrix<Type> getMatQ() const; 
+		/// get the the result of a matrix's R
+		Matrix<Type> getMatR() const; 
 		///template<typename Type>
 		Matrix<Type> PerMatrix( int size, int *pcol ); 		
 		Type operator=( const Type &x );
@@ -80,6 +92,12 @@ namespace NumericRecipesLab
 		Matrix<Type> LM;
 		/// the result of matrix's U
 		Matrix<Type> UM;
+		/// the result of matrix's Q
+		Matrix<Type> QM;
+		/// the result of matrix's R
+		Matrix<Type> RM;
+		/// the result of matrix's R's inv
+		Matrix<Type> invRM;
 		/// the result of matrix's P
 		Matrix<Type> PM;
 		/// the result of matrix's L's inv
